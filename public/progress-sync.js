@@ -11,7 +11,15 @@ function mergeProgress(remote,local,normalize){
 }
 window.ProgressSync=(()=>{
  let session=null,timer=null,serial=0,status='Connexion requise pour synchroniser';
- const show=message=>{status=message;document.querySelectorAll('[data-sync-status]').forEach(el=>el.textContent=status)};
+ const show=message=>{
+ status=message;
+ // Les états de travail restent internes. Seul un échec s'affiche dans le compte.
+ const failed=/bloquée|indisponible|illisible|impossible/.test(status);
+ document.querySelectorAll('[data-sync-error]').forEach(el=>{
+  el.hidden=!failed;
+  el.textContent=failed?'Votre progression est conservée sur cet appareil, mais sa sauvegarde sur vos autres appareils est momentanément indisponible.':'';
+ });
+ };
  function stop(){serial++;clearTimeout(timer);session?.unsubscribe?.();session=null;show('Progression locale · connexion requise')}
  async function start(options){
  stop();const ticket=serial;show('Chargement de votre progression…');

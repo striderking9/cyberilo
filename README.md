@@ -36,3 +36,7 @@ Contrôle JavaScript et contenu des 8 modules réussi. Sept tests de fusion de p
 Les règles Firestore ne sont pas encore publiées par ce paquet et n’ont pas été testées ici sur émulateur. Connexion Google, synchronisation réelle entre deux appareils et envoi d’avis doivent être vérifiés sur le site publié.
 
 La progression est déclarative, modifiable côté navigateur ; ce parcours ne fournit pas de certification officielle. Le partage natif dépend du navigateur. Les liens de bilan ne produisent pas d’aperçu social personnalisé ; joindre la carte PNG. Le contact ouvre la messagerie, sans envoi automatique. Les avis restent désactivés jusqu’à la recette Firestore.
+
+## Affichage de la sauvegarde
+
+La synchronisation fonctionne en arrière-plan. Aucun bandeau de chargement, de sauvegarde ou de réussite n’est affiché sur l’accueil ou dans les modules. Un échec est signalé discrètement dans Mon espace ; cet avis disparaît à la reprise du service.
