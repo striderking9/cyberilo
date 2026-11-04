@@ -1,0 +1,16 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const app=fs.readFileSync('public/app.js','utf8');
+const normalize=app.slice(app.indexOf('function normalize('),app.indexOf('function load('));
+const ctx={validCompletionDate:v=>v||'',window:{addEventListener(){}},document:{querySelectorAll:()=>[]}};
+vm.createContext(ctx);vm.runInContext(normalize+'\n'+fs.readFileSync('public/progress-sync.js','utf8'),ctx);
+const empty={version:2,completed:[],current:0,answers:{},read:[],revealed:[],lessonSteps:{},practiceAnswers:{},completedAt:'',participantName:''};
+const merge=(a,b)=>JSON.parse(JSON.stringify(ctx.mergeProgress(a,b,ctx.normalize)));
+const cloud={...empty,completed:[0,1,2],current:3,lessonSteps:{3:4},participantName:'Participant'},phone={...empty,completed:[0],lessonSteps:{3:1}};
+assert.deepEqual(merge(cloud,phone).completed,[0,1,2]);
+assert.deepEqual(merge(phone,cloud).completed,[0,1,2]);
+assert.equal(merge(cloud,phone).lessonSteps[3],4);
+assert.deepEqual(merge(cloud,phone),merge(merge(cloud,phone),phone));
+assert.deepEqual(merge(empty,cloud).completed,[0,1,2]);
+assert.equal(merge(cloud,empty).participantName,'Participant');
+assert.equal(merge({...cloud,completedAt:'2026-11-04'},{...phone,completedAt:'2026-11-05'}).completedAt,'2026-11-04');
+console.log('7 contrôles de fusion réussis.');

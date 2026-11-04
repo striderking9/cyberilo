@@ -33,3 +33,9 @@ body{font-family:'Segoe UI',Roboto,Arial,sans-serif;font-size:16px;line-height:1
 @media print{.feedback-invite,.form-panel,.contact-note{display:none!important}}
 
 .author-link{color:inherit;text-decoration:none;text-underline-offset:3px}.author-link:hover{text-decoration:underline}.author-link:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+
+/* Identité Cyberilo V1 et fermeture accessible du sommaire mobile. */
+.brand{font-weight:750;letter-spacing:-.6px}.brand svg{width:34px;height:34px;flex-shrink:0}.achievement-brand svg{width:30px;height:30px}.sidebar-top{display:flex;justify-content:space-between;align-items:start;gap:12px;margin-bottom:30px}.sidebar-top .exit{margin:0}.sidebar-close{display:none}.sidebar-overlay{display:none}.sidebar-is-open{overflow:hidden}
+@media(max-width:720px){.sidebar-top{align-items:center;margin-bottom:26px}.sidebar-close{display:grid;place-items:center;font-size:28px;line-height:1;width:38px;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}.sidebar-overlay:not([hidden]){display:block;position:fixed;inset:0;background:rgba(10,25,36,.55);border:0;z-index:14}.sidebar{z-index:15;max-width:calc(100vw - 48px)}.brand svg{width:30px;height:30px}}
+@media print{.sidebar-overlay,.sidebar-close{display:none!important}}

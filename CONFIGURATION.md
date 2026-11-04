@@ -1,144 +1,71 @@
-# Guide de mise en ligne — Cyber Réflexes
+# Publication de Cyberilo V1
 
-## État de livraison
+## 1. Préserver les données existantes
 
-- Nom et signature : Oumar Bocoum.
-- Profil LinkedIn : `https://www.linkedin.com/in/oumar-bocoum-10505114a/`.
-- Contact public : `obocoum.66@gmail.com` (modifiable dans `public/config.js`).
-- Les quatre champs Firebase restent à renseigner avec votre propre projet.
-- `feedbackEnabled` reste à `false` jusqu'à l'installation des règles et à la recette de la collecte.
-- L'hébergement cible est GitHub Pages ; aucun serveur applicatif à installer.
+Avant de remplacer le site, exporter la progression sur chaque appareil important depuis « Exporter ma progression ». Conserver le même dépôt GitHub, le même projet Firebase et le même domaine de publication. Les clés de sauvegarde du navigateur sont volontairement inchangées. Ne pas effacer les données du navigateur.
 
-## 1. Créer le projet Firebase
+Le fichier public/config.js contient déjà la configuration publique de votre projet cyber-reflexe-452a9. Ne pas créer un second projet pour le changement de nom. Aucune clé privée ni compte de service ne doit être ajouté au site. Le nom technique CYBER_CONFIG est conservé.
 
-1. Ouvrir la console Firebase : https://console.firebase.google.com/.
-2. Créer ou choisir votre projet. Google Analytics n'est pas nécessaire.
-3. Ajouter une application **Web** (`</>`), nommée par exemple `Cyber Reflexes Web`.
-4. Ne pas activer Firebase Hosting : le site sera hébergé sur GitHub Pages.
-5. Récupérer la configuration publique de l'application Web dans les paramètres du projet.
-6. Compléter uniquement les valeurs de votre projet dans `public/config.js` :
+## 2. Firebase Authentication
 
-```javascript
-window.CYBER_CONFIG = {
-  author: 'Oumar Bocoum',
-  authorLinkedIn: 'https://www.linkedin.com/in/oumar-bocoum-10505114a/',
-  contactEmail: 'obocoum.66@gmail.com',
-  feedbackEnabled: false,
-  firebase: {
-    apiKey: 'COPIER_LA_VALEUR_FIREBASE',
-    authDomain: 'COPIER_LA_VALEUR_FIREBASE',
-    projectId: 'COPIER_LA_VALEUR_FIREBASE',
-    appId: 'COPIER_LA_VALEUR_FIREBASE'
-  }
-};
-```
+Dans votre console Firebase existante :
 
-Les valeurs de configuration Web Firebase identifient l'application et sont destinées au code client. Ne jamais placer de clé privée, secret OAuth, fichier de compte de service ou jeton personnel dans ce projet.
+1. Authentication → Sign-in method : vérifier que Google est activé.
+2. Authentication → Settings → Authorized domains : vérifier striderking9.github.io (sans protocole ni chemin). Ajouter le domaine personnalisé si nécessaire.
+3. Mettre le nom public de l’application à Cyberilo et vérifier l’adresse de support ainsi que l’écran de consentement Google.
+4. Pour des tests locaux, ajouter localhost aux domaines autorisés.
 
-## 2. Activer Google Authentication
+Les modules demandent une connexion Google lorsque Firebase est configuré. Les pages d’information restent publiques.
 
-1. Dans **Authentication → Sign-in method**, activer **Google**.
-2. Compléter le nom public et l'e-mail de support demandés, puis enregistrer.
-3. Dans **Authentication → Settings → Authorized domains**, ajouter le nom d'hôte final sans protocole ni chemin : par exemple `votre-compte.github.io`.
-4. Ajouter votre domaine personnalisé si vous en utilisez un. Pour un test local, ajouter `localhost` explicitement.
-5. Dans l'écran de consentement Google, vérifier le nom de l'application, les coordonnées et les éventuelles demandes de publication affichées dans votre console. Si le projet est en mode test, ajouter les comptes de test ; terminer les étapes exigées avant l'ouverture générale.
+## 3. Firestore : indispensable pour la synchronisation
 
-Quand les quatre champs Firebase sont remplis, le site demande une connexion Google pour ouvrir les modules. Les pages d'information et la carte d'un bilan partagé restent accessibles sans connexion.
+1. Ouvrir Firestore Database dans le même projet. Créer la base (default) en mode production si elle n’existe pas.
+2. Dans Règles, remplacer le contenu par firestore.rules fourni à la racine du ZIP, puis publier.
+3. Ne pas utiliser des règles ouvertes. Chaque compte accède seulement à progress/{uid}. Les autres utilisateurs ne peuvent pas lister ces données.
+4. Suivre la recette complète de SYNCHRONISATION.md avant d’annoncer la synchronisation opérationnelle.
 
-Sans paramètres Firebase, le site permet une exploration locale et explique que Google n'est pas encore actif. Cela permet de prévisualiser la mise en page, mais ne constitue pas une recette de la connexion.
-
-## 3. Activer la réception privée des feedbacks
-
-**Firestore est nécessaire pour conserver les avis à distance.** Il ne sert pas à synchroniser la progression dans cette version.
-
-1. Dans **Firestore Database**, créer une base **Standard / Native** `(default)` en mode production, et choisir une région adaptée à vos besoins.
-2. Ouvrir l'onglet **Rules / Règles**.
-3. Remplacer le contenu par celui du fichier `firestore.rules`, puis publier les règles. Ne pas utiliser des règles de test ouvertes.
-4. Dans l'outil de simulation des règles, vérifier les cas de la section « Recette » ci-dessous. Pour une validation automatisée plus complète, utiliser les émulateurs officiels Firebase.
-5. Dans `public/config.js`, passer `feedbackEnabled` à `true`, puis publier cette modification sur GitHub.
-6. Se connecter avec un compte de test, terminer les modules et envoyer un avis.
-7. Dans **Firestore → Data**, vérifier la présence du document `feedback/{uid}`.
-8. Refaire un envoi depuis le même compte : le document est mis à jour au lieu d'en créer un second.
-
-Les retours contiennent : identifiant de compte, note d'utilité, sentiment d'être mieux préparé, commentaire facultatif, version de parcours, nombre de modules déclaré et date de réception serveur. Ils ne sont pas affichés publiquement. Aucun champ supplémentaire de nom ou d'e-mail n'est envoyé dans le document d'avis.
-
-Le responsable consulte les avis dans la console Firebase avec ses droits d'administration. L'application du visiteur n'a aucun accès de lecture aux avis. Ne partagez pas votre compte d'administration avec les participants.
-
-### Recette des règles
-
-| Cas | Résultat attendu |
-| --- | --- |
-| Visiteur non connecté écrit un avis | Refus |
-| Compte A écrit dans `feedback/UID_B` | Refus |
-| Compte Google A écrit son avis valide dans `feedback/UID_A` | Acceptation |
-| Note hors intervalle 1–5 | Refus |
-| Commentaire de plus de 1 500 caractères | Refus |
-| Champ supplémentaire dans l'avis | Refus |
-| Visiteur ou participant lit la collection | Refus |
-| Compte A met à jour son propre avis valide | Acceptation |
-
-Le champ `completedModules` est validé dans sa forme ; les règles ne prouvent pas la réalisation effective du parcours, car la progression est locale.
-
-### Déploiement facultatif par CLI
-
-Si vous disposez déjà de la CLI officielle Firebase, vous pouvez publier uniquement les règles :
+Si la CLI Firebase officielle est déjà installée et authentifiée :
 
 ```bash
-firebase login
-firebase deploy --only firestore:rules --project VOTRE_PROJECT_ID
+firebase deploy --only firestore:rules --project cyber-reflexe-452a9
 ```
 
-Remplacer `VOTRE_PROJECT_ID` par votre identifiant réel. Aucune configuration Hosting n'est requise.
+Firebase Hosting n’est pas nécessaire. Le site reste sur GitHub Pages.
 
-### Conservation et suppression
+## 4. Mettre à jour GitHub Pages
 
-Avant d'ouvrir la collecte, définir la durée de conservation de vos avis et la renseigner dans la notice de confidentialité (`public/app.js`, fonction `privacy`). Pour une demande d'effacement, le responsable supprime le document correspondant dans Firestore. Supprimer l'utilisateur d'Authentication ne supprime pas automatiquement son avis.
+1. Décompresser Cyberilo_V1.zip.
+2. Copier le contenu du dossier cyberilo-v1 à la racine de votre dépôt existant striderking9/cyber-reflexe. Remplacer les fichiers existants et inclure .github, public, scripts et firestore.rules. Ne pas envoyer le ZIP lui-même ni ajouter un dossier parent supplémentaire.
+3. Dans Settings → Pages, choisir GitHub Actions.
+4. Valider les changements sur main ; attendre que le workflow « Publier Cyberilo sur GitHub Pages » réussisse.
+5. Le workflow publie le dossier public, qui contient index.html. Ne pas publier la racine du dépôt : cela afficherait le README.
+6. Recharger le site sur ordinateur et téléphone. Si une ancienne version reste visible, effectuer un rechargement complet.
 
-Quand la collecte est désactivée, le site sauvegarde seulement un brouillon sur le navigateur et le signale clairement. Il ne dit pas que l'avis a été envoyé. L'avis est facultatif et n'empêche jamais le bilan ni son partage.
+Le nom du dépôt peut rester cyber-reflexe : il n’est pas nécessaire de changer l’adresse du site pour afficher Cyberilo.
 
-## 4. Publier sur GitHub Pages
+## 5. Activer les feedbacks après la recette
 
-1. Créer un dépôt GitHub vide, par exemple `cyber-reflexes`. Choisir une visibilité compatible avec votre offre GitHub Pages.
-2. Décompresser le ZIP. Envoyer **le contenu** du dossier `cyber-reflexes` à la racine du dépôt, notamment le dossier `.github` ; ne pas ajouter un niveau de dossier parent.
-3. Dans **Settings → Pages → Build and deployment**, sélectionner **GitHub Actions**.
-4. Dans **Actions**, lancer le workflow `Publier Cyber Reflexes sur GitHub Pages`, ou pousser un commit sur `main`.
-5. Attendre le déploiement réussi. L'adresse exacte figure dans **Settings → Pages** et dans l'environnement `github-pages`.
-6. Reporter le nom d'hôte de cette adresse dans les domaines autorisés Firebase.
+La collecte reste désactivée avec feedbackEnabled: false. Les brouillons restent sur le navigateur et aucun avis n’est annoncé envoyé.
 
-Depuis votre ordinateur :
+Après publication des règles :
 
-```bash
-git init
-git add .
-git commit -m "Publier Cyber Réflexes"
-git branch -M main
-git remote add origin https://github.com/VOTRE_COMPTE/cyber-reflexes.git
-git push -u origin main
-```
+1. Choisir une durée de conservation des avis et l’indiquer dans la notice de confidentialité (fonction privacy dans public/app.js).
+2. Passer feedbackEnabled à true dans public/config.js puis publier.
+3. Avec un compte de test ayant terminé les modules, ouvrir le bilan puis envoyer un avis.
+4. Vérifier dans Firestore le document feedback/{uid}. Un nouvel avis du même compte remplace le précédent.
+5. Vérifier le refus des visiteurs non connectés, d’un compte écrivant pour un autre, des notes hors 1–5 et des commentaires de plus de 1500 caractères. Les visiteurs n’ont pas accès en lecture aux avis.
 
-Remplacer le compte et le nom du dépôt. Si vous travaillez dans un dépôt existant, conservez son historique et intégrez les fichiers sans réinitialisation.
+Les retours sont privés, facultatifs et consultables par le responsable dans la console Firebase. La note, le commentaire, le sentiment de préparation, l’identifiant du compte et la date serveur sont transmis. Le nombre de modules est déclaratif, sans certification sécurisée.
 
-Le workflow publie uniquement le dossier `public`. Aucun build ni installation de dépendances n'est nécessaire. La navigation utilise des fragments (`#/module/0`) compatibles avec les sous-chemins GitHub Pages et le rechargement des pages.
+Supprimer un compte Authentication ne supprime pas automatiquement sa progression ni son avis. Pour une demande d’effacement, supprimer également les documents correspondants dans Firestore avec les droits d’administration.
 
-## 5. Contact et signature
+## 6. Recette avant ouverture
 
-Toutes les signatures textuelles « Oumar Bocoum » du site ouvrent le profil LinkedIn dans un nouvel onglet. La carte PNG est une image : sa signature est visible mais n'est pas un lien cliquable.
+- Se connecter avec Google sur le domaine final.
+- Valider un module sur ordinateur et le retrouver sur téléphone avec le même compte, puis faire l’inverse. Attendre « Progression synchronisée » avant de changer d’appareil.
+- Tester la reconnexion réseau, une réinitialisation volontaire sur un compte de test et deux comptes séparés.
+- Vérifier dans le simulateur de règles que A ne peut pas lire/écrire progress/UID_B et qu’un visiteur anonyme est refusé.
+- Vérifier la croix du sommaire mobile, le clic extérieur, Échap, les thèmes et le bilan.
+- Vérifier la signature LinkedIn et le formulaire Contact, qui ouvre la messagerie sans envoyer automatiquement.
 
-La page Contact utilise l'adresse de `contactEmail`. Le bouton ouvre la messagerie du visiteur avec un message prérempli ; l'envoi est effectué par le visiteur dans son application. Vérifier cette ouverture depuis un appareil avec une messagerie configurée. Modifier l'adresse avant publication si vous souhaitez une autre boîte de contact.
-
-Les références pédagogiques restent en texte simple. Seule la signature personnelle a été liée au profil demandé.
-
-## 6. Derniers contrôles sur l'adresse finale
-
-- Page d'accueil, page À propos, Contact et aide : affichage correct sur téléphone et ordinateur.
-- Signatures : le profil LinkedIn est le bon.
-- Connexion Google et déconnexion : fonctionnelles depuis le domaine final.
-- Quiz erroné : module suivant verrouillé ; quiz corrigé : déblocage.
-- Rechargement : progression et étape de lecture conservées sur le navigateur.
-- Dernier quiz : page de félicitations et bilan disponibles.
-- Carte PNG : génération, enregistrement et nom affiché corrects.
-- Lien de bilan : ouverture sur un autre navigateur sans connexion, quand le site est public.
-- Feedback : envoi réel confirmé dans Firestore ; aucune lecture publique.
-- Contact : ouverture de la messagerie vers l'adresse choisie.
-
-Les quatre paramètres Firebase et les opérations dans votre console restent à réaliser. Sans eux, Google et la collecte à distance ne peuvent pas être vérifiés ni annoncés comme actifs.
+Les vérifications locales réussissent, mais la publication des règles et la recette de vos services restent à effectuer dans votre environnement.

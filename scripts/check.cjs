@@ -1,7 +1,7 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const cp=require('node:child_process');
-for(const f of ['public/app.js','public/course.js','public/config.js'])cp.execFileSync(process.execPath,['--check',f]);
+for(const f of ['public/app.js','public/course.js','public/config.js','public/progress-sync.js'])cp.execFileSync(process.execPath,['--check',f]);
 const ctx={window:{}};vm.createContext(ctx);vm.runInContext(fs.readFileSync('public/course.js','utf8'),ctx);
 const course=ctx.window.COURSE;
 if(course.length!==8)throw new Error('Le parcours doit contenir huit modules.');

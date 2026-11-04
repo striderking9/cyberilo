@@ -23,8 +23,35 @@ service cloud.firestore {
       allow create, update: if owner() && validFeedback();
       allow delete: if owner();
     }
+    match /progress/{userId} {
+      function owner() { return request.auth != null && request.auth.uid == userId; }
+      function validProgress() {
+        let d = request.resource.data;
+        let p = d.progress;
+        return d.keys().hasAll(['uid', 'epoch', 'progress', 'updatedAt'])
+          && d.keys().hasOnly(['uid', 'epoch', 'progress', 'updatedAt'])
+          && d.uid == request.auth.uid && d.epoch is int && d.epoch >= 0
+          && d.updatedAt == request.time
+          && p is map && p.keys().hasAll(['version','completed','current','answers','read','revealed','lessonSteps','practiceAnswers','completedAt','participantName'])
+          && p.keys().hasOnly(['version','completed','current','answers','read','revealed','lessonSteps','practiceAnswers','completedAt','participantName'])
+          && p.version == 2 && p.completed is list && p.completed.size() <= 8
+          && p.completed.hasOnly([0,1,2,3,4,5,6,7])
+          && p.current is int && p.current >= 0 && p.current < 8
+          && p.answers is map && p.answers.size() <= 8
+          && p.lessonSteps is map && p.lessonSteps.size() <= 8
+          && p.practiceAnswers is map && p.practiceAnswers.size() <= 8
+          && p.read is list && p.read.size() <= 8 && p.revealed is list && p.revealed.size() <= 8
+          && p.completedAt is string && p.completedAt.size() <= 10
+          && p.participantName is string && p.participantName.size() <= 80;
+      }
+      allow get: if owner();
+      allow list: if false;
+      allow create, update: if owner() && validProgress();
+      allow delete: if owner();
+    }
     match /{document=**} {
       allow read, write: if false;
     }
   }
 }
+
