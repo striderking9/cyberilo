@@ -1,7 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const app=fs.readFileSync('public/app.js','utf8');
 const normalize=app.slice(app.indexOf('function normalize('),app.indexOf('function load('));
-const ctx={validCompletionDate:v=>v||'',window:{addEventListener(){}},document:{querySelectorAll:()=>[]}};
+const ctx={validCompletionDate:v=>v||'',COURSE:Array(8),window:{addEventListener(){}},document:{querySelectorAll:()=>[]}};
 vm.createContext(ctx);vm.runInContext(normalize+'\n'+fs.readFileSync('public/progress-sync.js','utf8'),ctx);
 const empty={version:2,completed:[],current:0,answers:{},read:[],revealed:[],lessonSteps:{},practiceAnswers:{},completedAt:'',participantName:''};
 const merge=(a,b)=>JSON.parse(JSON.stringify(ctx.mergeProgress(a,b,ctx.normalize)));

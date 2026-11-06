@@ -3,7 +3,7 @@ window.CYBER_CONFIG = {
   author: 'Oumar Bocoum',
   authorLinkedIn: 'https://www.linkedin.com/in/oumar-bocoum-10505114a/',
   contactEmail: 'obocoum.66@gmail.com',
-  feedbackEnabled: false, // Passer à true après installation et vérification des règles Firestore.
+  feedbackEnabled: true, // Publier les règles Firestore de cette version avant ouverture.
   firebase: {
     apiKey: "AIzaSyDm1OPyb61rfDIAx516HHNQ36EqmEEXr94",
     authDomain: "cyber-reflexe-452a9.firebaseapp.com",

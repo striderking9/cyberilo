@@ -1,3 +1,5 @@
+> V1 enrichie : lire d’abord EVOLUTIONS_V1.md et publier les nouvelles règles complètes.
+
 # Activer la synchronisation entre appareils
 
 La progression est désormais sauvegardée dans `progress/{uid}` sur Firestore, indépendamment de l'option de collecte des avis. Chaque personne doit utiliser le **même compte Google** sur ses appareils.
@@ -7,7 +9,7 @@ La progression est désormais sauvegardée dans `progress/{uid}` sur Firestore, 
 1. Dans le projet `cyber-reflexe-452a9`, ouvrir **Firestore Database**. Créer la base `(default)` en mode production si elle n'existe pas.
 2. Ouvrir **Règles**, remplacer le contenu par le fichier `firestore.rules` de cette modification, puis **Publier**. Les règles des feedbacks sont conservées ; les nouvelles règles limitent la progression à son propriétaire.
 3. Fusionner la modification du site sur `main` et attendre la réussite du déploiement Pages.
-4. Recharger le site sur l'appareil le plus avancé, se connecter avec le compte habituel et attendre **Progression synchronisée**.
+4. Recharger le site sur l'appareil le plus avancé, se connecter avec le compte habituel et vérifier dans Firestore que le document du compte a été actualisé.
 5. Sur l'autre appareil, se connecter avec exactement le même compte, puis recharger. Les modules validés sont fusionnés et la progression distante est récupérée.
 
 Ne videz pas les données de vos navigateurs avant cette opération. La première synchronisation importe automatiquement la progression locale de l'espace du compte connecté. Pour une progression restée en mode invité, utilisez d'abord l'export puis l'import dans l'espace connecté.

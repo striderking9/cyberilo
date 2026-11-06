@@ -1,57 +1,137 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /feedback/{userId} {
-      function owner() {
-        return request.auth != null
-          && request.auth.uid == userId
-          && request.auth.token.firebase.sign_in_provider == 'google.com';
-      }
-      function validFeedback() {
-        let d = request.resource.data;
-        return d.keys().hasAll(['uid', 'rating', 'prepared', 'comment', 'courseVersion', 'completedModules', 'updatedAt'])
-          && d.keys().hasOnly(['uid', 'rating', 'prepared', 'comment', 'courseVersion', 'completedModules', 'updatedAt'])
-          && d.uid == request.auth.uid
-          && d.rating is int && d.rating >= 1 && d.rating <= 5
-          && d.prepared in ['oui', 'partiellement', 'non']
-          && d.comment is string && d.comment.size() <= 1500
-          && d.courseVersion == 'socle-v1'
-          && d.completedModules == 8
-          && d.updatedAt == request.time;
-      }
-      allow read: if false;
-      allow create, update: if owner() && validFeedback();
-      allow delete: if owner();
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.enabled == true;
     }
-    match /progress/{userId} {
-      function owner() { return request.auth != null && request.auth.uid == userId; }
-      function validProgress() {
-        let d = request.resource.data;
-        let p = d.progress;
-        return d.keys().hasAll(['uid', 'epoch', 'progress', 'updatedAt'])
-          && d.keys().hasOnly(['uid', 'epoch', 'progress', 'updatedAt'])
-          && d.uid == request.auth.uid && d.epoch is int && d.epoch >= 0
-          && d.updatedAt == request.time
-          && p is map && p.keys().hasAll(['version','completed','current','answers','read','revealed','lessonSteps','practiceAnswers','completedAt','participantName'])
-          && p.keys().hasOnly(['version','completed','current','answers','read','revealed','lessonSteps','practiceAnswers','completedAt','participantName'])
-          && p.version == 2 && p.completed is list && p.completed.size() <= 8
-          && p.completed.hasOnly([0,1,2,3,4,5,6,7])
-          && p.current is int && p.current >= 0 && p.current < 8
-          && p.answers is map && p.answers.size() <= 8
-          && p.lessonSteps is map && p.lessonSteps.size() <= 8
-          && p.practiceAnswers is map && p.practiceAnswers.size() <= 8
-          && p.read is list && p.read.size() <= 8 && p.revealed is list && p.revealed.size() <= 8
-          && p.completedAt is string && p.completedAt.size() <= 10
-          && p.participantName is string && p.participantName.size() <= 80;
+    function validCourseId(id) { return id is string && id.size() <= 60 && id.matches('^[a-z0-9]+(-[a-z0-9]+)*$'); }
+    function validProgress(uid) {
+      let d = request.resource.data;
+      let p = d.progress;
+      return d.keys().hasAll(['uid','epoch','progress','updatedAt'])
+        && d.keys().hasOnly(['uid','epoch','progress','updatedAt'])
+        && d.uid == uid && d.epoch is int && d.epoch >= 0 && d.updatedAt == request.time
+        && p is map
+        && p.keys().hasAll(['version','completed','current','answers','read','revealed','lessonSteps','practiceAnswers','completedAt','participantName'])
+        && p.keys().hasOnly(['version','completed','current','answers','read','revealed','lessonSteps','practiceAnswers','completedAt','participantName'])
+        && p.version == 2 && p.completed is list && p.completed.size() <= 24
+        && p.completed.hasOnly([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23])
+        && p.current is int && p.current >= 0 && p.current < 24
+        && p.answers is map && p.answers.size() <= 24
+        && p.lessonSteps is map && p.lessonSteps.size() <= 24
+        && p.practiceAnswers is map && p.practiceAnswers.size() <= 24
+        && p.read is list && p.read.size() <= 24
+        && p.revealed is list && p.revealed.size() <= 24
+        && p.completedAt is string && p.completedAt.size() <= 10
+        && p.participantName is string && p.participantName.size() <= 80;
+    }
+    function validProfile(p) {
+      return p is map && (p.size() == 0 || (p.keys().hasAll(['displayName','language','theme','at'])
+        && p.keys().hasOnly(['displayName','language','theme','at'])
+        && p.displayName is string && p.displayName.size() <= 80
+        && p.language in ['fr','en'] && p.theme in ['light','dark','system']
+        && p.at is string && p.at.size() <= 30));
+    }
+    function validLearning(uid) {
+      let d = request.resource.data;
+      let p = d.payload;
+      return d.keys().hasAll(['uid','payload','updatedAt']) && d.keys().hasOnly(['uid','payload','updatedAt'])
+        && d.uid == uid && d.updatedAt == request.time
+        && p is map && p.keys().hasAll(['schema','events','assessments','exercises'])
+        && p.keys().hasOnly(['schema','events','assessments','exercises','profile','courses'])
+        && p.schema == 1 && p.events is map && p.events.size() <= 200
+        && p.assessments is map && p.assessments.size() <= 4
+        && p.exercises is map && p.exercises.size() <= 24
+        && (!('profile' in p) || validProfile(p.profile))
+        && (!('courses' in p) || (p.courses is map && p.courses.size() <= 12));
+    }
+    function validCatalog() {
+      let d = request.resource.data;
+      return d.fr is list && d.en is list && d.fr.size() >= 1 && d.fr.size() <= 24
+        && d.fr.size() == d.en.size() && d.version is int && d.version >= 1;
+    }
+    function expectedModules(courseId) {
+      let path = courseId == 'securite-numerique'
+        ? /databases/$(database)/documents/content/catalog
+        : /databases/$(database)/documents/content/$(courseId);
+      return exists(path) ? get(path).data.fr.size() : (courseId == 'securite-numerique' ? 8 : 0);
+    }
+    function completedCourse(uid,courseId) {
+      let path = courseId == 'securite-numerique'
+        ? /databases/$(database)/documents/progress/$(uid)
+        : /databases/$(database)/documents/progress/$(uid)/courses/$(courseId);
+      return expectedModules(courseId) > 0 && exists(path)
+        && get(path).data.progress.completed.size() >= expectedModules(courseId);
+    }
+    function validFeedback(uid,courseId) {
+      let d = request.resource.data;
+      return d.keys().hasAll(['uid','courseId','rating','prepared','comment','courseVersion','completedModules','updatedAt'])
+        && d.keys().hasOnly(['uid','courseId','rating','prepared','comment','courseVersion','completedModules','updatedAt'])
+        && d.uid == uid && d.courseId == courseId
+        && d.rating is int && d.rating >= 1 && d.rating <= 5
+        && d.prepared in ['oui','partiellement','non']
+        && d.comment is string && d.comment.size() <= 1500
+        && d.courseVersion is string && d.courseVersion.size() <= 60
+        && d.completedModules is int && d.completedModules == expectedModules(courseId)
+        && d.updatedAt == request.time && completedCourse(uid,courseId);
+    }
+    match /admins/{uid} { allow get: if owner(uid); allow list, write: if false; }
+    match /learning/{uid} {
+      allow get: if owner(uid); allow list: if false;
+      allow create, update: if owner(uid) && validLearning(uid);
+      allow delete: if owner(uid);
+    }
+    match /progress/{uid} {
+      allow get: if owner(uid); allow list: if false;
+      allow create, update: if owner(uid) && validProgress(uid);
+      allow delete: if owner(uid);
+      match /courses/{courseId} {
+        allow get: if owner(uid); allow list: if false;
+        allow create, update: if owner(uid) && validCourseId(courseId) && validProgress(uid);
+        allow delete: if owner(uid);
       }
-      allow get: if owner();
-      allow list: if false;
-      allow create, update: if owner() && validProgress();
-      allow delete: if owner();
     }
-    match /{document=**} {
-      allow read, write: if false;
+    match /content/{id} {
+      allow get: if validCourseId(id); allow list: if false;
+      allow create, update: if isAdmin() && validCourseId(id) && validCatalog()
+        && request.resource.data.keys().hasOnly(['fr','en','version','publishedAt'])
+        && request.resource.data.publishedAt == request.time;
+      allow delete: if false;
     }
+    match /contentDrafts/{id} {
+      allow read: if isAdmin();
+      allow create, update: if isAdmin() && validCourseId(id) && validCatalog()
+        && request.resource.data.keys().hasOnly(['fr','en','version','updatedAt'])
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /contentVersions/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && validCatalog()
+        && request.resource.data.keys().hasOnly(['fr','en','version','publishedAt'])
+        && request.resource.data.publishedAt == request.time;
+      allow update, delete: if false;
+    }
+    match /contentHistory/{courseId}/versions/{version} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && validCourseId(courseId) && validCatalog()
+        && request.resource.data.keys().hasOnly(['fr','en','version','publishedAt'])
+        && request.resource.data.publishedAt == request.time;
+      allow update, delete: if false;
+    }
+    match /feedback/{uid} {
+      allow get: if owner(uid) || isAdmin(); allow list: if isAdmin();
+      allow create, update: if owner(uid) && validFeedback(uid,'securite-numerique');
+      allow delete: if owner(uid) || isAdmin();
+    }
+    match /courseFeedback/{courseId}/responses/{uid} {
+      allow get: if owner(uid) || isAdmin(); allow list: if isAdmin();
+      allow create, update: if owner(uid) && validCourseId(courseId) && validFeedback(uid,courseId);
+      allow delete: if owner(uid) || isAdmin();
+    }
+    match /{document=**} { allow read, write: if false; }
   }
 }
-

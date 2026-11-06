@@ -24,7 +24,7 @@ window.ProgressSync=(()=>{
  async function start(options){
  stop();const ticket=serial;show('Chargement de votre progression…');
  try{const f=await import('https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js');if(ticket!==serial)return;
- const ref=f.doc(f.getFirestore(options.app),'progress',options.uid),epochKey='cyber-progress-epoch:'+options.uid;
+ const ref=f.doc(f.getFirestore(options.app),...window.CyberPlatform.paths(options.uid,options.courseId).progress),epochKey='cyber-progress-epoch:'+options.uid+(options.courseId===window.CyberPlatform.primary?'':':'+options.courseId);
  let epoch=0;try{epoch=Number(localStorage.getItem(epochKey))||0}catch(e){}
  const s=session={...options,f,ref,epochKey,epoch,ready:false,dirty:0,busy:false,resetting:false,ticket};
  const keepEpoch=n=>{s.epoch=n;try{localStorage.setItem(epochKey,String(n))}catch(e){}};
@@ -52,7 +52,8 @@ window.ProgressSync=(()=>{
  finally{if(session===s){s.busy=false;if(s.dirty&&s.dirty!==revision)schedule()}}
  }
  function changed(){if(session){session.dirty++;schedule()}}
- async function reset(progress){const s=session;if(!s||!s.ready||s.busy)throw Error('sync-not-ready');s.resetting=true;clearTimeout(timer);show('Réinitialisation du compte…');try{const epoch=await s.f.runTransaction(s.f.getFirestore(s.app),async tx=>{const snap=await tx.get(s.ref);const epoch=(Number(snap.data()?.epoch)||0)+1;tx.set(s.ref,{uid:s.uid,epoch,progress:s.normalize(progress),updatedAt:s.f.serverTimestamp()});return epoch});if(session!==s)return;s.keepEpoch(epoch);s.dirty=0;s.apply(s.normalize(progress));show('Progression synchronisée')}catch(error){show('Réinitialisation impossible · copie locale conservée');throw error}finally{s.resetting=false}}
+ async function reset(progress){const s=session;if(!s||!s.ready||s.busy)throw Error('sync-not-ready');s.resetting=true;clearTimeout(timer);show('Réinitialisation du compte…');try{const epoch=await s.f.runTransaction(s.f.getFirestore(s.app),async tx=>{const snap=await tx.get(s.ref);if(session!==s)throw Error('session-changed');const epoch=(Number(snap.data()?.epoch)||0)+1;tx.set(s.ref,{uid:s.uid,epoch,progress:s.normalize(progress),updatedAt:s.f.serverTimestamp()});return epoch});if(session!==s)return;s.keepEpoch(epoch);s.dirty=0;s.apply(s.normalize(progress));show('Progression synchronisée')}catch(error){show('Réinitialisation impossible · copie locale conservée');throw error}finally{s.resetting=false}}
  window.addEventListener('online',()=>{if(session){session.dirty++;schedule()}});
- return{start,stop,changed,reset,refresh:()=>show(status)};
+ async function prepareSignOut(timeout=3500){const s=session;if(!s)return false;clearTimeout(timer);if(s.ready&&!s.busy&&s.dirty)void flush(s);const until=Date.now()+timeout;while(session===s&&(s.dirty||s.busy)&&Date.now()<until)await new Promise(r=>setTimeout(r,100));return session===s&&s.ready&&!s.dirty&&!s.busy}
+ return{start,stop,changed,reset,prepareSignOut,refresh:()=>show(status)};
 })();

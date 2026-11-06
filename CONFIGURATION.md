@@ -1,3 +1,5 @@
+> V1 enrichie : lire d’abord AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md et publier les nouvelles règles complètes.
+
 # Publication de Cyberilo V1
 
 ## 1. Préserver les données existantes
@@ -15,7 +17,7 @@ Dans votre console Firebase existante :
 3. Mettre le nom public de l’application à Cyberilo et vérifier l’adresse de support ainsi que l’écran de consentement Google.
 4. Pour des tests locaux, ajouter localhost aux domaines autorisés.
 
-Les modules demandent une connexion Google lorsque Firebase est configuré. Les pages d’information restent publiques.
+Les modules et les espaces personnels demandent une connexion Google. Les pages d’information restent publiques.
 
 ## 3. Firestore : indispensable pour la synchronisation
 
@@ -35,7 +37,7 @@ Firebase Hosting n’est pas nécessaire. Le site reste sur GitHub Pages.
 ## 4. Mettre à jour GitHub Pages
 
 1. Décompresser Cyberilo_V1.zip.
-2. Copier le contenu du dossier cyberilo-v1 à la racine de votre dépôt existant striderking9/cyber-reflexe. Remplacer les fichiers existants et inclure .github, public, scripts et firestore.rules. Ne pas envoyer le ZIP lui-même ni ajouter un dossier parent supplémentaire.
+2. Copier le contenu du dossier cyberilo-v1 à la racine de votre dépôt existant striderking9/cyberilo. Remplacer les fichiers existants et inclure .github, public, scripts et firestore.rules. Ne pas envoyer le ZIP lui-même ni ajouter un dossier parent supplémentaire.
 3. Dans Settings → Pages, choisir GitHub Actions.
 4. Valider les changements sur main ; attendre que le workflow « Publier Cyberilo sur GitHub Pages » réussisse.
 5. Le workflow publie le dossier public, qui contient index.html. Ne pas publier la racine du dépôt : cela afficherait le README.
@@ -45,24 +47,24 @@ Le nom du dépôt peut rester cyber-reflexe : il n’est pas nécessaire de chan
 
 ## 5. Activer les feedbacks après la recette
 
-La collecte reste désactivée avec feedbackEnabled: false. Les brouillons restent sur le navigateur et aucun avis n’est annoncé envoyé.
+Cette livraison utilise feedbackEnabled: true. Publier les nouvelles règles avant le site. En cas d’échec, la saisie reste un brouillon privé dans ce navigateur et aucun succès n’est annoncé. Pour différer l’ouverture, mettre feedbackEnabled: false.
 
 Après publication des règles :
 
 1. Choisir une durée de conservation des avis et l’indiquer dans la notice de confidentialité (fonction privacy dans public/app.js).
-2. Passer feedbackEnabled à true dans public/config.js puis publier.
+2. Vérifier feedbackEnabled: true dans public/config.js, puis publier le site.
 3. Avec un compte de test ayant terminé les modules, ouvrir le bilan puis envoyer un avis.
 4. Vérifier dans Firestore le document feedback/{uid}. Un nouvel avis du même compte remplace le précédent.
-5. Vérifier le refus des visiteurs non connectés, d’un compte écrivant pour un autre, des notes hors 1–5 et des commentaires de plus de 1500 caractères. Les visiteurs n’ont pas accès en lecture aux avis.
+5. Vérifier le refus des visiteurs non connectés, d’un compte écrivant pour un autre, des notes hors 1–5 et des commentaires de plus de 1500 caractères. Les visiteurs et les autres participants n’ont pas accès aux avis. L’auteur peut relire et modifier son propre avis.
 
-Les retours sont privés, facultatifs et consultables par le responsable dans la console Firebase. La note, le commentaire, le sentiment de préparation, l’identifiant du compte et la date serveur sont transmis. Le nombre de modules est déclaratif, sans certification sécurisée.
+Les retours sont privés, facultatifs et consultables par les administrateurs habilités dans Administration → Avis et par leur auteur. La note, le commentaire, le sentiment de préparation, l’identifiant du compte et la date serveur sont transmis. Le nombre de modules est déclaratif, sans certification sécurisée.
 
 Supprimer un compte Authentication ne supprime pas automatiquement sa progression ni son avis. Pour une demande d’effacement, supprimer également les documents correspondants dans Firestore avec les droits d’administration.
 
 ## 6. Recette avant ouverture
 
 - Se connecter avec Google sur le domaine final.
-- Valider un module sur ordinateur et le retrouver sur téléphone avec le même compte, puis faire l’inverse. Attendre « Progression synchronisée » avant de changer d’appareil.
+- Valider un module sur ordinateur et le retrouver sur téléphone avec le même compte, puis faire l’inverse. Vérifier que les données apparaissent sur le second appareil ; la synchronisation est silencieuse.
 - Tester la reconnexion réseau, une réinitialisation volontaire sur un compte de test et deux comptes séparés.
 - Vérifier dans le simulateur de règles que A ne peut pas lire/écrire progress/UID_B et qu’un visiteur anonyme est refusé.
 - Vérifier la croix du sommaire mobile, le clic extérieur, Échap, les thèmes et le bilan.
