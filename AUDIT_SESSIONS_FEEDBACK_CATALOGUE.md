@@ -1,6 +1,6 @@
 # Cyberilo — révision des sessions, avis et catalogue
 
-Version du 6 novembre 2026. Ce document complète les guides précédents et fait foi pour cette livraison.
+Version du 6 novembre 2026. Ce document décrit les accès et la séparation des formations. ACCUEIL_AUDIO_DEUX_FORMATIONS.md le complète pour la dernière livraison.
 
 ## Sessions et accès
 
@@ -31,7 +31,7 @@ Les avis restent privés : lecture par leur auteur et par les administrateurs ha
 - Sélecteur de formation dans l’espace personnel et l’administration.
 - Résultats, exercices, révisions, historique et feedback rattachés à la formation sélectionnée.
 
-Cette V1 contient toujours une seule formation réelle : les huit modules de sécurité numérique. Aucun faux cours ou indicateur de participants n’est ajouté. La structure est prête pour enregistrer d’autres formations ; la création complète d’une formation depuis un formulaire administrateur n’est pas incluse. L’atelier modifie les modules des formations déjà enregistrées.
+Cette V1 contient deux formations réelles : huit modules de sécurité numérique et six ateliers pour protéger ses comptes. Aucun faux cours ou indicateur de participants n’est ajouté. La structure est prête pour enregistrer d’autres formations ; la création complète d’une formation depuis un formulaire administrateur n’est pas incluse. L’atelier modifie les modules des formations déjà enregistrées.
 
 Les cartes des autres formations utilisent les progressions déjà chargées sur cet appareil. Elles ne prétendent pas avoir téléchargé toutes les progressions distantes en parallèle. Ouvrir une formation lance sa synchronisation.
 
@@ -50,7 +50,7 @@ Les données de la première formation gardent leurs chemins existants : aucune 
 
 Le profil reste commun au compte dans `learning/{uid}.payload.profile`. Les activités de la première formation sont plafonnées à 200 événements ; celles de chaque autre formation à 100, avec 12 formations supplémentaires maximum dans ce document. Prévoir une autre organisation de stockage si ce volume augmente fortement.
 
-Pour ajouter une formation, enregistrer sa définition dans `window.CYBER_TRAININGS` dans un script chargé après les données pédagogiques et avant `experience.js` (voir le contrat de `platform.js`). Fournir un identifiant stable, titre/description/catégorie/niveau FR et EN, statut `published`, accès `free`, tableaux `fr` et `en` de même longueur, de 1 à 24 modules valides. Ne pas changer les identifiants de formations ou réordonner les modules existants : les acquis utilisent leurs indices. Publier ensuite le contenu correspondant dans l’atelier avant de collecter des avis de cette nouvelle formation. Les formations payantes et la gestion d’inscriptions ne sont pas incluses.
+Pour ajouter une formation, enregistrer sa définition dans `window.CYBER_TRAININGS` dans un script chargé après les données pédagogiques et avant `experience.js` (voir le contrat de `platform.js`). Fournir un identifiant stable, titre/description/catégorie/niveau FR et EN, statut `published`, accès `free`, tableaux `fr` et `en` de même longueur, de 1 à 24 modules valides. Ne pas changer les identifiants de formations ou réordonner les modules existants : les acquis utilisent leurs indices. Pour les formations supplémentaires au-delà des deux parcours intégrés, publier le contenu correspondant dans l’atelier avant de collecter des avis. Les deux parcours intégrés ont respectivement 8 et 6 modules reconnus par les règles même avant publication dans l’atelier. Les formations payantes et la gestion d’inscriptions ne sont pas incluses.
 
 Les exports de progression contiennent désormais `courseId` et `progress`. Les anciens exports restent acceptés ; les nouveaux exports d’une autre formation sont refusés pour empêcher un mélange accidentel.
 

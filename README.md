@@ -6,20 +6,20 @@ Site statique HTML/CSS/JavaScript pour GitHub Pages. Connexion Google via Fireba
 
 ## Mise à jour de votre site
 
-**Commencer par AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md** : correction des sessions, accès privés, avis et structure pour plusieurs formations. Puis lire CONFIGURATION.md pour la publication des règles.
+**Commencer par ACCUEIL_AUDIO_DEUX_FORMATIONS.md** : nouvel accueil, en-tête mobile, lecture vocale et deuxième formation. Le guide AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md complète les accès privés et les avis. Puis lire CONFIGURATION.md pour la publication des règles.
 
 
 Suivre CONFIGURATION.md puis SYNCHRONISATION.md. La configuration publique du projet existant est conservée. Le dépôt et le projet Firebase gardent leurs noms techniques pour préserver les accès et les sauvegardes.
 
 ## Contenu
 
-- 8 modules, 6 séquences par module, 24 messages clés et 24 questions expliquées.
+- Deux formations gratuites : 8 modules sur les bases et 6 ateliers sur la protection des comptes. Chaque module comporte 6 étapes, 3 messages clés et 3 questions expliquées, dans les deux langues.
 - Validation de 3 questions sur 3 avant le module suivant.
 - Progression locale et synchronisation des acquis entre appareils connectés au même compte.
 - Thèmes clair et sombre, police Segoe UI et mise en page mobile.
 - Sommaire mobile : croix de fermeture, clic extérieur et touche Échap.
 - Bilan, carte PNG, lien de partage et impression ; feedback facultatif après le bilan.
-- Pages À propos, Contact, Aide et Confidentialité. Signature LinkedIn d’Oumar Bocoum.
+- Pages À propos, Contact, Aide et Confidentialité. Signature Cyberilo dans les pieds de page ; auteur et lien LinkedIn dans À propos.
 - Logos SVG/PNG dans public/assets ; charte PDF dans identite.
 
 ## Vérification locale
@@ -29,6 +29,7 @@ node scripts/check.cjs
 node scripts/test-progress-sync.cjs
 node scripts/test-experience.cjs
 node scripts/test-platform.cjs
+node scripts/test-audio.cjs
 python3 -m http.server 8080 --directory public
 ```
 

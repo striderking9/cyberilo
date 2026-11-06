@@ -1,6 +1,6 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const ctx={window:{addEventListener(){}},document:{addEventListener(){}},localStorage:{getItem(){return null}},structuredClone,setTimeout,clearTimeout};vm.createContext(ctx);
-for(const f of ['course.js','learning-data.js','course-en.js','platform.js','experience.js'])vm.runInContext(fs.readFileSync('public/'+f,'utf8'),ctx);
+for(const f of ['course.js','learning-data.js','course-en.js','account-course.js','platform.js','experience.js'])vm.runInContext(fs.readFileSync('public/'+f,'utf8'),ctx);
 const x=ctx.window.CyberExperience,fr=ctx.window.COURSE_FR,en=ctx.window.COURSE_EN;
 assert.equal(x.validateCatalog({fr,en,version:1}).en.length,8);
 assert.throws(()=>x.validateCatalog({fr,en:en.slice(1),version:1}));
@@ -24,3 +24,5 @@ const a={...empty,courses:{'second-course':{events:{a:{at:'2026-01-01'}},assessm
 const b={...empty,courses:{'third-course':{events:{b:{at:'2026-01-02'}},assessments:{},exercises:{}}}};
 const courses=x.merge(a,b).courses;assert.equal(Object.keys(courses['second-course'].events).length,1);assert.equal(Object.keys(courses['third-course'].events).length,1);
 console.log('Historique : conservation indépendante des activités de plusieurs formations : OK.');
+
+const second=ctx.window.CYBER_TRAININGS[0];assert.equal(x.validateCatalog({...second,version:1}).fr.length,6);assert.equal(ctx.window.CyberPlatform.courses().length,2);console.log('Deuxième formation : six ateliers bilingues et quiz valides : OK.');

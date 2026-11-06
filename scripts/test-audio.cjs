@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+let calls=[],utterances=[];const nodes={};for(const name of ['play','stop','rate','status'])nodes[name]={textContent:'',disabled:false,value:'1',setAttribute(){}};
+const controls={isConnected:true,querySelector:s=>nodes[s.match(/audio-(play|stop|rate|status)/)[1]],setAttribute(){}};
+const synth={speaking:false,getVoices:()=>[{lang:'fr-FR',localService:true}],cancel(){calls.push('cancel');this.speaking=false},pause(){calls.push('pause')},resume(){calls.push('resume')},speak(u){utterances.push(u);this.speaking=true;u.onstart?.()}};
+const doc={documentElement:{lang:'fr'},addEventListener(){},querySelector:()=>({prepend(){}}),createElement:()=>controls};
+const ctx={window:{speechSynthesis:synth,addEventListener(){}},document:doc,SpeechSynthesisUtterance:class{constructor(text){this.text=text}},setTimeout:()=>1,clearTimeout(){}};vm.createContext(ctx);vm.runInContext(fs.readFileSync('public/audio.js','utf8'),ctx);const a=ctx.window.CyberAudio;
+const m={title:'Module',scenario:'Situation.',prompt:'Votre choix ?',practice:{options:['Premier.','Second.']},desc:'Objectif.',heading:'Leçon.',intro:'Comprendre.',detail:'Détail.',body:['Repère.','Signal.'],keyMessages:[['Titre.','Message.'],['Titre.','Message.'],['Titre.','Message.']],steps:['Vérifier.'],takeaway:'Retenir.',reveal:'Explication.'};
+a.mount(m,0);assert.equal(utterances.length,0,'No autoplay');nodes.play.onclick();assert.ok(utterances.length);assert.equal(utterances[0].lang,'fr-FR');assert.equal(nodes.play.textContent,'Pause');nodes.play.onclick();assert.equal(nodes.play.textContent,'Reprendre');nodes.play.onclick();assert.ok(calls.includes('resume'));const stale=utterances[0],count=utterances.length;a.stop();stale.onend();assert.equal(utterances.length,count,'Cancelled speech must not continue');
+assert.equal(a.paragraphs(m,5).length,0,'Quiz answers are never read automatically');assert.ok(a.chunks(['word '.repeat(200)]).every(x=>x.length<=220));
+doc.documentElement.lang='en';a.mount(m,1);nodes.play.onclick();assert.equal(utterances.at(-1).lang,'en-GB');a.stop();
+console.log('Audio : démarrage volontaire, pause/reprise, arrêt, callbacks périmés, quiz exclu et langue : OK.');

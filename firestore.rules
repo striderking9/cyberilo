@@ -57,7 +57,7 @@ service cloud.firestore {
       let path = courseId == 'securite-numerique'
         ? /databases/$(database)/documents/content/catalog
         : /databases/$(database)/documents/content/$(courseId);
-      return exists(path) ? get(path).data.fr.size() : (courseId == 'securite-numerique' ? 8 : 0);
+      return exists(path) ? get(path).data.fr.size() : (courseId == 'securite-numerique' ? 8 : (courseId == 'proteger-ses-comptes' ? 6 : 0));
     }
     function completedCourse(uid,courseId) {
       let path = courseId == 'securite-numerique'

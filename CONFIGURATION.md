@@ -1,4 +1,4 @@
-> V1 enrichie : lire d’abord AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md et publier les nouvelles règles complètes.
+> V1 enrichie : lire d’abord ACCUEIL_AUDIO_DEUX_FORMATIONS.md puis AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md et publier les nouvelles règles complètes.
 
 # Publication de Cyberilo V1
 
