@@ -1,6 +1,6 @@
 # Cyberilo — accueil, audio et deuxième formation
 
-Révision du 6 novembre 2026. Lire ce document en premier pour cette livraison.
+Notes de la révision du 6 novembre 2026. Le README décrit le catalogue actuel et les étapes de mise à jour.
 
 ## Ce qui est livré
 

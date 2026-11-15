@@ -1,4 +1,4 @@
-> V1 enrichie : lire d’abord ACCUEIL_AUDIO_DEUX_FORMATIONS.md puis AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md et publier les nouvelles règles complètes.
+> Cette version ajoute le parcours « Protéger son téléphone et ses données ». Publiez les règles fournies pour que les six modules soient reconnus lors de l’envoi d’un avis.
 
 # Publication de Cyberilo V1
 

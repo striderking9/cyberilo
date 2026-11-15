@@ -1,19 +1,21 @@
 # Cyberilo — V1
 
-Parcours gratuit de sensibilisation à la sécurité numérique, proposé par Oumar Bocoum.
+Formations gratuites de sensibilisation à la sécurité numérique, proposées par Oumar Bocoum.
 
 Site statique HTML/CSS/JavaScript pour GitHub Pages. Connexion Google via Firebase Authentication et synchronisation privée via Cloud Firestore.
 
 ## Mise à jour de votre site
 
-**Commencer par ACCUEIL_AUDIO_DEUX_FORMATIONS.md** : nouvel accueil, en-tête mobile, lecture vocale et deuxième formation. Le guide AUDIT_SESSIONS_FEEDBACK_CATALOGUE.md complète les accès privés et les avis. Puis lire CONFIGURATION.md pour la publication des règles.
+Cette version ajoute « Protéger son téléphone et ses données ». Le cours comporte six ateliers en français et en anglais, pour une durée indicative de 33 minutes.
 
-
-Suivre CONFIGURATION.md puis SYNCHRONISATION.md. La configuration publique du projet existant est conservée. Le dépôt et le projet Firebase gardent leurs noms techniques pour préserver les accès et les sauvegardes.
+Publiez le fichier complet `firestore.rules` dans le projet Firebase existant pour permettre l’envoi d’un avis à la fin du nouveau cours. Mettez ensuite à jour les fichiers du dépôt GitHub Pages. Les étapes figurent dans [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Contenu
 
-- Deux formations gratuites : 8 modules sur les bases et 6 ateliers sur la protection des comptes. Chaque module comporte 6 étapes, 3 messages clés et 3 questions expliquées, dans les deux langues.
+- Les bases de la sécurité numérique · 8 modules.
+- Protéger ses comptes au quotidien · 6 ateliers.
+- Protéger son téléphone et ses données · 6 ateliers sur le verrouillage, les applications, les mises à jour, la sauvegarde, le partage et la perte ou le vol.
+- Chaque module comporte six étapes, trois messages clés, un exercice et un quiz corrigé. L’écoute utilise la voix disponible dans le navigateur.
 - Validation de 3 questions sur 3 avant le module suivant.
 - Progression locale et synchronisation des acquis entre appareils connectés au même compte.
 - Thèmes clair et sombre, police Segoe UI et mise en page mobile.
@@ -37,7 +39,7 @@ Ouvrir http://localhost:8080 ; autoriser localhost dans Firebase pour tester Goo
 
 ## Validation et limites
 
-Contrôle JavaScript et contenu des 8 modules réussi. Sept tests de fusion de progression réussis. Fermeture mobile vérifiée par croix, Échap et clic extérieur sur une largeur de 390 pixels.
+Les tests vérifient la structure des 20 modules bilingues, la séparation des acquis et des avis, la fusion de progression, la fiche mémo et les commandes audio. En aperçu mobile avec un compte simulé, les six quiz ont mené au bilan du parcours téléphone et le formulaire d’avis a été testé.
 
 Les règles Firestore ne sont pas encore publiées par ce paquet et n’ont pas été testées ici sur émulateur. Connexion Google, synchronisation réelle entre deux appareils et envoi d’avis doivent être vérifiés sur le site publié.
 
@@ -47,7 +49,7 @@ La progression est déclarative, modifiable côté navigateur ; ce parcours ne f
 
 La synchronisation fonctionne en arrière-plan. Aucun bandeau de chargement, de sauvegarde ou de réussite n’est affiché sur l’accueil ou dans les modules. Un échec est signalé discrètement dans Mon espace ; cet avis disparaît à la reprise du service.
 
-Les huit modules existent aussi en anglais. Les nouveaux scripts experience.js, learning-data.js et course-en.js ajoutent le diagnostic, les exercices, les révisions, le tableau de bord et les formulaires administrateur. Les rôles se configurent depuis la console Firebase, jamais depuis une liste d’e-mails publique dans le code.
+Les trois formations et leurs exercices sont disponibles en français et en anglais. Les rôles administrateur se configurent dans Firebase.
 
 ## Tableaux de bord et compte
 
